@@ -10,6 +10,9 @@ import android.content.Intent
 import android.support.v7.app.AlertDialog
 import android.app.AlarmManager
 import android.app.PendingIntent
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 
 const val EXTRA_TASK = "jp.techacademy.fumito.ikemoto.taskapp.TASK"
 
@@ -33,6 +36,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         categoryButton.setOnClickListener{
+            val intent = Intent(this@MainActivity, CategoryActivity::class.java)
+            startActivity(intent)
         }
 
         // Realmの設定
@@ -91,13 +96,34 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
+        val categoryArray = mRealm.where(Category::class.java).findAll()
+        val categoryAdapter : ArrayAdapter<Category> = ArrayAdapter(applicationContext,
+            android.R.layout.simple_spinner_item,
+            categoryArray
+        )
+        spinner.adapter = categoryAdapter
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
+        {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                reloadListView()
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
+        }
         reloadListView()
     }
 
     private fun reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
-        val taskRealmResults = mRealm.where(Task::class.java).findAll().sort("date", Sort.DESCENDING)
-
+        val taskRealmResults = mRealm.where(Task::class.java).findAll()
+            .sort("date", Sort.DESCENDING)
+            .filter { task -> task.category == spinner.selectedItem as Category}
         // 上記の結果を、TaskList としてセットする
         mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
 

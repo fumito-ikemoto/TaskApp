@@ -12,6 +12,9 @@ import java.util.*
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.util.Log
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 
 class InputActivity : AppCompatActivity() {
 
@@ -71,7 +74,15 @@ class InputActivity : AppCompatActivity() {
         val taskId = intent.getIntExtra(EXTRA_TASK, -1)
         val realm = Realm.getDefaultInstance()
         mTask = realm.where(Task::class.java).equalTo("id", taskId).findFirst()
+        val categoryArray = realm.where(Category::class.java).findAll()
         realm.close()
+
+        val categoryAdapter : ArrayAdapter<Category> = ArrayAdapter(applicationContext,
+            android.R.layout.simple_spinner_item,
+            categoryArray
+        )
+        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = categoryAdapter
 
         if (mTask == null) {
             // 新規作成の場合
@@ -100,6 +111,7 @@ class InputActivity : AppCompatActivity() {
             date_button.text = dateString
             times_button.text = timeString
         }
+
     }
 
     private fun addTask() {
@@ -124,12 +136,18 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
+        var category = spinner.selectedItem as? Category
+        if(category == null)
+        {
+            category = Category()
+        }
 
         mTask!!.title = title
         mTask!!.contents = content
         val calendar = GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute)
         val date = calendar.time
         mTask!!.date = date
+        mTask!!.category = category
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
