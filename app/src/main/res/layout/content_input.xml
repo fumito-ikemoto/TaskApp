@@ -60,4 +60,13 @@
 
         />
 
+    <Button
+        android:id="@+id/categoryButton"
+        android:layout_width="140dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/times_button"
+        android:layout_alignParentRight="false"
+        android:text="カテゴリー作成"
+        />
+
 </RelativeLayout>

@@ -71,6 +71,11 @@ class InputActivity : AppCompatActivity() {
         times_button.setOnClickListener(mOnTimeClickListener)
         done_button.setOnClickListener(mOnDoneClickListener)
 
+        categoryButton.setOnClickListener { view ->
+            val intent = Intent(this@InputActivity, CategoryActivity::class.java)
+            startActivity(intent)
+        }
+
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         val intent = intent
         val taskId = intent.getIntExtra(EXTRA_TASK, -1)
@@ -143,10 +148,6 @@ class InputActivity : AppCompatActivity() {
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
         var category = categoryArray[spinner.selectedItemPosition]
-        if(category == null)
-        {
-            category = Category()
-        }
 
         mTask!!.title = title
         mTask!!.contents = content
@@ -157,7 +158,6 @@ class InputActivity : AppCompatActivity() {
 
         realm.copyToRealmOrUpdate(mTask!!)
         realm.commitTransaction()
-
         realm.close()
 
         val resultIntent = Intent(applicationContext, TaskAlarmReceiver::class.java)

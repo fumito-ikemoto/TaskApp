@@ -21,14 +21,6 @@
         android:src="@drawable/plus"
         app:backgroundTint="@color/colorPrimary"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginBottom="120dp"
-        android:text = "カテゴリー"
-        android:id="@+id/categoryButton"/>
-
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

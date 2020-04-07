@@ -36,11 +36,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        categoryButton.setOnClickListener{
-            val intent = Intent(this@MainActivity, CategoryActivity::class.java)
-            startActivity(intent)
-        }
-
         // Realmの設定
         mRealm = Realm.getDefaultInstance()
         mRealm.addChangeListener(mRealmListener)
