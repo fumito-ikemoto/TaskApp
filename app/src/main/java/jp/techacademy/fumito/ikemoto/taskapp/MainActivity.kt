@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var mTaskAdapter: TaskAdapter
+    private lateinit var mCategoryArrayAdapter: ArrayAdapter<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,11 +98,17 @@ class MainActivity : AppCompatActivity() {
         }
 
         val categoryArray = mRealm.where(Category::class.java).findAll()
-        val categoryAdapter : ArrayAdapter<Category> = ArrayAdapter(applicationContext,
+        val categoryNameArray = mutableListOf<String>()
+        categoryArray.forEach{category ->
+            categoryNameArray.add(category.name)
+        }
+
+        mCategoryArrayAdapter = ArrayAdapter(applicationContext,
             android.R.layout.simple_spinner_item,
-            categoryArray
+            categoryNameArray
         )
-        spinner.adapter = categoryAdapter
+
+        spinner.adapter = mCategoryArrayAdapter
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener
         {
             override fun onItemSelected(
@@ -116,16 +123,24 @@ class MainActivity : AppCompatActivity() {
                 //
             }
         }
-        reloadListView()
     }
 
     private fun reloadListView() {
         // Realmデータベースから、「全てのデータを取得して新しい日時順に並べた結果」を取得
         val taskRealmResults = mRealm.where(Task::class.java).findAll()
             .sort("date", Sort.DESCENDING)
-            .filter { task -> task.category == spinner.selectedItem as Category}
+            .filter { task -> task.category!!.name == spinner.selectedItem as String}
         // 上記の結果を、TaskList としてセットする
         mTaskAdapter.taskList = mRealm.copyFromRealm(taskRealmResults)
+
+        val categoryRealmResult = mRealm.where(Category::class.java).findAll()
+        val categoryNameArray = mutableListOf<String>()
+        categoryRealmResult.forEach{category ->
+            categoryNameArray.add(category.name)
+        }
+
+        mCategoryArrayAdapter.clear()
+        mCategoryArrayAdapter.addAll(categoryNameArray)
 
         // TaskのListView用のアダプタに渡す
         listView1.adapter = mTaskAdapter
