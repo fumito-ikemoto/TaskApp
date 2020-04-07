@@ -25,6 +25,8 @@ class InputActivity : AppCompatActivity() {
     private var mMinute = 0
     private var mTask: Task? = null
 
+    private var categoryArray = mutableListOf<Category>()
+
     private val mOnDateClickListener = View.OnClickListener {
         val datePickerDialog = DatePickerDialog(this,
             DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
@@ -74,12 +76,16 @@ class InputActivity : AppCompatActivity() {
         val taskId = intent.getIntExtra(EXTRA_TASK, -1)
         val realm = Realm.getDefaultInstance()
         mTask = realm.where(Task::class.java).equalTo("id", taskId).findFirst()
-        val categoryArray = realm.where(Category::class.java).findAll()
+        categoryArray = realm.where(Category::class.java).findAll()
         realm.close()
+        val categoryNameArray = mutableListOf<String>()
+        categoryArray.forEach{category ->
+            categoryNameArray.add(category.name)
+        }
 
-        val categoryAdapter : ArrayAdapter<Category> = ArrayAdapter(applicationContext,
+        val categoryAdapter : ArrayAdapter<String> = ArrayAdapter(applicationContext,
             android.R.layout.simple_spinner_item,
-            categoryArray
+            categoryNameArray
         )
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = categoryAdapter
@@ -136,7 +142,7 @@ class InputActivity : AppCompatActivity() {
 
         val title = title_edit_text.text.toString()
         val content = content_edit_text.text.toString()
-        var category = spinner.selectedItem as? Category
+        var category = categoryArray[spinner.selectedItemPosition]
         if(category == null)
         {
             category = Category()
